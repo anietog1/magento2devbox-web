@@ -83,11 +83,11 @@ ADD conf/php-fpm-magento2.conf /usr/local/etc/php-fpm.d/php-fpm-magento2.conf
 # apache config
 ADD conf/apache-default.conf /etc/apache2/sites-enabled/apache-default.conf
 
-# Postfix
+# Postfix/Sendmail
 run echo "postfix postfix/main_mailer_type string Internet site" > preseed.txt
 run echo "postfix postfix/mailname string mail.example.com" >> preseed.txt
 run debconf-set-selections preseed.txt
-run DEBIAN_FRONTEND=noninteractive apt-get install -q -y postfix
+run DEBIAN_FRONTEND=noninteractive apt-get install -q -y postfix sendmail
 run postconf -e myhostname=mail.example.com
 run postconf -e mydestination="mail.example.com, example.com, localhost.localdomain, localhost"
 run postconf -e mail_spool_directory="/var/spool/mail/"
