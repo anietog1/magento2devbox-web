@@ -18,7 +18,7 @@ RUN apt-get update && apt-get install -y \
     libpng12-dev \
     git \
     vim \
-    sendmail \
+    sendmail-bin \
     openssh-server \
     supervisor \
     mysql-client \
