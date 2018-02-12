@@ -18,6 +18,7 @@ RUN apt-get update && apt-get install -y \
     libpng12-dev \
     git \
     vim \
+    sendmail-bin \
     openssh-server \
     supervisor \
     mysql-client \
@@ -26,7 +27,7 @@ RUN apt-get update && apt-get install -y \
     telnet \
     && docker-php-ext-configure gd --with-freetype-dir=/usr/include/ --with-jpeg-dir=/usr/include/ \
     && docker-php-ext-configure hash --with-mhash \
-    && docker-php-ext-install -j$(nproc) mcrypt intl xsl gd zip pdo_mysql mysql opcache soap bcmath json iconv \
+    && docker-php-ext-install -j$(nproc) mcrypt intl xsl gd zip pdo_mysql opcache soap bcmath json iconv \
     && curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer \
     && pecl install xdebug && docker-php-ext-enable xdebug \
     && echo "xdebug.remote_enable=1" >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini \
@@ -39,9 +40,9 @@ RUN apt-get update && apt-get install -y \
     && echo "xdebug.remote_connect_back=0" >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini \
     && chmod 666 /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini \
     && mkdir /var/run/sshd \
-    && apt-get clean && apt-get update && apt-get install -y nodejs \
-    && ln -s /usr/bin/nodejs /usr/bin/node \
-    && apt-get install -y npm \
+    && apt-get clean && apt-get update \
+    && curl -sL https://deb.nodesource.com/setup_8.x | sudo -E bash - \
+    && apt-get install -y nodejs \
     && npm update -g npm && npm install -g grunt-cli && npm install -g gulp \
     && echo "StrictHostKeyChecking no" >> /etc/ssh/ssh_config \
     && apt-get install -y apache2 \

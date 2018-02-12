@@ -7,16 +7,6 @@ Please refer to Magento for latest updates.
 
 # Software requirements
 1. Docker
-2. Brew
-```
-/usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
-```
-3. docker-sync and unison
-```
-sudo gem install docker-sync
-brew install unison
-sudo easy_install pip && sudo pip install macfsevents
-```
 
 # Installation
 
@@ -25,16 +15,12 @@ sudo easy_install pip && sudo pip install macfsevents
 mkdir -p myproject/shared
 cd myproject
 curl https://raw.githubusercontent.com/talosdigital/magento2devbox-web/php5-6/docker-compose.yml > docker-compose.yml 
-curl https://raw.githubusercontent.com/talosdigital/magento2devbox-web/php5-6/docker-sync.yml > docker-sync.yml 
 ```
 
 2. Modify keys for your project
 ```
 #
 # file: docker-compose.yml
-#   replace `talosdevbox` with `YOUR_PROJECT_CODENAME`
-#
-# file: docker-sync.yml
 #   replace `talosdevbox` with `YOUR_PROJECT_CODENAME`
 #
 ```
@@ -44,12 +30,9 @@ curl https://raw.githubusercontent.com/talosdigital/magento2devbox-web/php5-6/do
 cp -R YOUR_PROJECT_FOLDER ./shared/webroot
 ```
 
-4. Start docker instances and docker-sync (two terminals)
+4. Start docker instances
 Make sure you have 80, 3360, 4022 and 9000 available in your computer.
 ```
-# Terminal1
-docker-sync start --foreground
-# Terminal2 
 docker-compose up
 ```
 
@@ -57,12 +40,13 @@ docker-compose up
 ```
 sudo ifconfig lo0 alias 10.254.254.254 255.255.255.0 # Check bellow how to add it at startup
 sudo vi /etc/hosts
+10.254.254.254 db
 10.254.254.254 local.magento2ce.com
 ```
 
 6. Prepare database
 ```
-mysql -h 10.254.254.254 -uroot -proot
+mysql -h db -uroot -proot
 CREATE DATABASE magento2ce;
 ```
 
@@ -75,24 +59,24 @@ CREATE DATABASE magento2ce;
 
 # Useful commands
 
-Magento bin
+Alias
+```
+# Useful aliases
+alias mysqldocker='mysql -h 10.254.254.254 -uroot -proot'
+alias sshdocker='ssh -p 4022 -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no magento2@localhost'
+```
 
+Magento SSH
 ```
 ssh -p 4022 magento2@localhost # FYI password: magento2
 cd /var/www/magento2
-php bin/magento cache:flush
 ```
 
 List running containers
 ```docker ps```
 
 List all containers
-
 ```docker ps```
-
-Clean sync cache
-
-```docker-sync clean```
 
 # Alias loopback interface (lo0) script at startup (Mac)
 ```
