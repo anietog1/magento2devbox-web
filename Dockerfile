@@ -3,11 +3,15 @@ MAINTAINER "Talos Digital"
 
 ENV PHP_EXTRA_CONFIGURE_ARGS="--enable-fpm --with-fpm-user=magento2 --with-fpm-group=magento2"
 
+ADD bin/instantclient-basiclite-linux.x64-12.2.0.1.0.zip /tmp/
+ADD bin/instantclient-sdk-linux.x64-12.2.0.1.0.zip /tmp/
+
 RUN apt-get update && apt-get install -y \
     apt-utils \
     sudo \
     wget \
     unzip \
+    bzip2 \
     cron \
     curl \
     libmcrypt-dev \
@@ -25,9 +29,16 @@ RUN apt-get update && apt-get install -y \
     ocaml \
     expect \
     telnet \
+    psmisc \
+    libaio-dev \
+	&& unzip /tmp/instantclient-basiclite-linux.x64-12.2.0.1.0.zip -d /usr/local/ \
+    && unzip /tmp/instantclient-sdk-linux.x64-12.2.0.1.0.zip -d /usr/local/ \
+    && ln -s /usr/local/instantclient_12_2 /usr/local/instantclient \
+    && ln -s /usr/local/instantclient/libclntsh.so.12.1 /usr/local/instantclient/libclntsh.so \
     && docker-php-ext-configure gd --with-freetype-dir=/usr/include/ --with-jpeg-dir=/usr/include/ \
     && docker-php-ext-configure hash --with-mhash \
-    && docker-php-ext-install -j$(nproc) mcrypt intl xsl gd zip pdo_mysql opcache soap bcmath json iconv \
+    && docker-php-ext-configure oci8 --with-oci8=instantclient,/usr/local/instantclient \
+    && docker-php-ext-install -j$(nproc) mcrypt intl xsl gd zip pdo_mysql opcache soap bcmath json iconv oci8 \
     && curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer \
     && pecl install xdebug && docker-php-ext-enable xdebug \
     && echo "xdebug.remote_enable=1" >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini \
