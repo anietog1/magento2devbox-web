@@ -5,6 +5,12 @@ Please refer to Magento for latest updates.
 
 ** IF YOU WANT TO RUN MAGENTO1 CHECK TAG talosdigital/magento2devbox-web:php5.6 **
 
+** UPDATE! for a better performance leave the magento files on docker only and share app/ with the following***
+```
+1) remove *./shared/webroot:/var/www/magento2:delegated* from docker-compose.yml
+2) use dsyncin and dsyncout when you need to sync files
+```
+
 # Software requirements
 1. Docker
 
