@@ -7,7 +7,7 @@ Please refer to Magento for latest updates.
 
 ** UPDATE! for a better performance leave the magento files on docker only and sync manually doing the following***
 ```
-1) remove *./shared/webroot:/var/www/magento2:delegated* from docker-compose.yml
+1) remove "./shared/webroot:/var/www/magento2:delegated" from docker-compose.yml
 2) use dsyncin and dsyncout when you need to sync files
 ```
 
