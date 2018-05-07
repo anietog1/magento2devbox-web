@@ -8,6 +8,7 @@ RUN apt-get update && apt-get install -y \
     sudo \
     wget \
     unzip \
+    bzip2 \
     cron \
     curl \
     libmcrypt-dev \
@@ -27,7 +28,7 @@ RUN apt-get update && apt-get install -y \
     telnet \
     && docker-php-ext-configure gd --with-freetype-dir=/usr/include/ --with-jpeg-dir=/usr/include/ \
     && docker-php-ext-configure hash --with-mhash \
-    && docker-php-ext-install -j$(nproc) mcrypt intl xsl gd zip pdo_mysql opcache soap bcmath json iconv \
+    && docker-php-ext-install -j$(nproc) mcrypt intl xsl gd zip pdo_mysql mysql mysqli opcache soap bcmath json iconv \
     && curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer \
     && pecl install xdebug-2.5.5 && docker-php-ext-enable xdebug \
     && echo "xdebug.remote_enable=1" >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini \
