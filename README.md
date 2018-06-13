@@ -72,8 +72,8 @@ Alias
 # Useful aliases
 alias mysqldocker='mysql -h 10.254.254.254 -uroot -proot'
 alias sshdocker='ssh -p 4022 -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no magento2@localhost'
-alias dsyncin='rsync -rvtu -e "ssh -p 4022" --exclude="app"  --exclude=".git/" --exclude=".idea/" . magento2@10.254.254.254:/var/www/magento2';
-alias dsyncout='rsync -rvtu -e "ssh -p 4022" --exclude="app"  --exclude=".git/" --exclude=".idea/" --exclude="generated/*" --exclude="var/*" --exclude="pub/static/*" magento2@10.254.254.254:/var/www/magento2/* .';
+alias dsyncin='rsync -rvtu -e "ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -p 4022" --exclude="app"  --exclude=".git/" --exclude=".idea/" . magento2@10.254.254.254:/var/www/magento2'
+alias dsyncout='rsync -rvtu -e "ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -p 4022" --exclude="app"  --exclude=".git/" --exclude=".idea/" --exclude="generated/*" --exclude="var/*" --exclude="pub/static/*" magento2@10.254.254.254:/var/www/magento2/* .'
 ```
 
 Magento Bin
