@@ -30,15 +30,17 @@ RUN apt-get update && apt-get install -y \
     expect \
     telnet \
     psmisc \
-    libaio-dev \
-	&& unzip /tmp/instantclient-basiclite-linux.x64-12.2.0.1.0.zip -d /usr/local/ \
+    libaio-dev
+
+RUN unzip /tmp/instantclient-basiclite-linux.x64-12.2.0.1.0.zip -d /usr/local/ \
     && unzip /tmp/instantclient-sdk-linux.x64-12.2.0.1.0.zip -d /usr/local/ \
     && ln -s /usr/local/instantclient_12_2 /usr/local/instantclient \
-    && ln -s /usr/local/instantclient/libclntsh.so.12.1 /usr/local/instantclient/libclntsh.so \
-    && docker-php-ext-configure gd --with-freetype-dir=/usr/include/ --with-jpeg-dir=/usr/include/ \
+    && ln -s /usr/local/instantclient/libclntsh.so.12.1 /usr/local/instantclient/libclntsh.so
+
+RUN docker-php-ext-configure gd --with-freetype-dir=/usr/include/ --with-jpeg-dir=/usr/include/ \
     && docker-php-ext-configure hash --with-mhash \
     && docker-php-ext-configure oci8 --with-oci8=instantclient,/usr/local/instantclient \
-    && docker-php-ext-install -j$(nproc) mcrypt intl xsl gd zip pdo_mysql mysqli opcache soap bcmath json iconv oci8 \
+    && docker-php-ext-install -j$(nproc) mcrypt intl xsl gd zip pdo_mysql mysqli opcache soap bcmath json iconv oci8 sockets xml mbstring \
     && curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer \
     && pecl install xdebug && docker-php-ext-enable xdebug \
     && echo "xdebug.remote_enable=1" >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini \
@@ -49,13 +51,20 @@ RUN apt-get update && apt-get install -y \
     && echo "xdebug.max_nesting_level=1000" >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini \
     && echo "xdebug.remote_autostart=true" >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini \
     && echo "xdebug.remote_connect_back=0" >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini \
-    && chmod 666 /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini \
-    && mkdir /var/run/sshd \
-    && apt-get clean && apt-get update \
+    && chmod 666 /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
+
+RUN apt-get install -y libmagickwand-6.q16-dev --no-install-recommends \
+	&& ln -s /usr/lib/x86_64-linux-gnu/ImageMagick-6.8.9/bin-Q16/MagickWand-config /usr/bin \
+	&& pecl install imagick \
+	&& echo "extension=imagick.so" > /usr/local/etc/php/conf.d/ext-imagick.ini
+
+RUN apt-get clean && apt-get update \
     && curl -sL https://deb.nodesource.com/setup_8.x | sudo -E bash - \
     && apt-get install -y nodejs \
-    && npm update -g npm && npm install -g grunt-cli && npm install -g gulp \
-    && echo "StrictHostKeyChecking no" >> /etc/ssh/ssh_config \
+    && npm update -g npm && npm install -g grunt-cli && npm install -g gulp-cli
+
+RUN mkdir /var/run/sshd \
+	&& echo "StrictHostKeyChecking no" >> /etc/ssh/ssh_config \
     && apt-get install -y apache2 \
     && a2enmod rewrite \
     && a2enmod proxy \
