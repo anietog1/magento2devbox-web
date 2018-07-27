@@ -1,4 +1,4 @@
-FROM php:7.1.17-fpm
+FROM php:7.1.20-fpm
 MAINTAINER "Talos Digital"
 
 ENV PHP_EXTRA_CONFIGURE_ARGS="--enable-fpm --with-fpm-user=magento2 --with-fpm-group=magento2"
@@ -30,7 +30,9 @@ RUN apt-get update && apt-get install -y \
     expect \
     telnet \
     psmisc \
-    libaio-dev
+    libaio-dev \
+    gnupg \
+    mailutils
 
 RUN unzip /tmp/instantclient-basiclite-linux.x64-12.2.0.1.0.zip -d /usr/local/ \
     && unzip /tmp/instantclient-sdk-linux.x64-12.2.0.1.0.zip -d /usr/local/ \
@@ -53,7 +55,7 @@ RUN docker-php-ext-configure gd --with-freetype-dir=/usr/include/ --with-jpeg-di
     && echo "xdebug.remote_connect_back=0" >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini \
     && chmod 666 /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
 
-RUN apt-get install -y libmagickwand-6.q16-dev --no-install-recommends \
+RUN apt-get update && apt-get install -y libmagickwand-6.q16-dev --no-install-recommends \
 	&& ln -s /usr/lib/x86_64-linux-gnu/ImageMagick-6.8.9/bin-Q16/MagickWand-config /usr/bin \
 	&& pecl install imagick \
 	&& echo "extension=imagick.so" > /usr/local/etc/php/conf.d/ext-imagick.ini
