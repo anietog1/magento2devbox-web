@@ -107,14 +107,14 @@ ADD conf/php-fpm-magento2.conf /usr/local/etc/php-fpm.d/php-fpm-magento2.conf
 ADD conf/apache-default.conf /etc/apache2/sites-enabled/apache-default.conf
 
 # Postfix
-run echo "postfix postfix/main_mailer_type string Internet site" > preseed.txt
-run echo "postfix postfix/mailname string mail.example.com" >> preseed.txt
-run debconf-set-selections preseed.txt
-run DEBIAN_FRONTEND=noninteractive apt-get install -q -y postfix
-run postconf -e myhostname=mail.example.com
-run postconf -e mydestination="mail.example.com, example.com, localhost.localdomain, localhost"
-run postconf -e mail_spool_directory="/var/spool/mail/"
-run postconf -e mailbox_command=""
+RUN echo "postfix postfix/main_mailer_type string Internet site" > preseed.txt
+RUN echo "postfix postfix/mailname string mail.example.com" >> preseed.txt
+RUN debconf-set-selections preseed.txt
+RUN DEBIAN_FRONTEND=noninteractive apt-get install -q -y postfix
+RUN postconf -e myhostname=mail.example.com
+RUN postconf -e mydestination="mail.example.com, example.com, localhost.localdomain, localhost"
+RUN postconf -e mail_spool_directory="/var/spool/mail/"
+RUN postconf -e mailbox_command=""
 
 ADD conf/entrypoint.sh /usr/local/bin/entrypoint.sh
 RUN chmod +x /usr/local/bin/entrypoint.sh
@@ -122,6 +122,8 @@ RUN chmod +x /usr/local/bin/entrypoint.sh
 ENV PATH $PATH:/home/magento2/scripts/:/home/magento2/.magento-cloud/bin
 ENV PATH $PATH:/var/www/magento2/bin
 ENV LD_LIBRARY_PATH /usr/local/instantclient_12_2/
+
+RUN echo "export LD_LIBRARY_PATH=/usr/local/instantclient_12_2/" >> /home/magento2/.bashrc
 
 ENV SHARED_CODE_PATH /var/www/magento2
 ENV WEBROOT_PATH /var/www/magento2
