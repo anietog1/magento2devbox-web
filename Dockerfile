@@ -1,4 +1,4 @@
-FROM php:7.0.12-fpm
+FROM php:7.2.15-fpm
 MAINTAINER "Talos Digital"
 
 ENV PHP_EXTRA_CONFIGURE_ARGS="--enable-fpm --with-fpm-user=magento2 --with-fpm-group=magento2"
@@ -19,7 +19,7 @@ RUN apt-get update && apt-get install -y \
     libxml2-dev libxslt1-dev \
     libfreetype6-dev \
     libjpeg62-turbo-dev \
-    libpng12-dev \
+    libpng-dev \
     git \
     vim \
     sendmail-bin \
@@ -30,7 +30,9 @@ RUN apt-get update && apt-get install -y \
     expect \
     telnet \
     psmisc \
-    libaio-dev
+    libaio-dev \
+    gnupg \
+    mailutils
 
 RUN unzip /tmp/instantclient-basiclite-linux.x64-12.2.0.1.0.zip -d /usr/local/ \
     && unzip /tmp/instantclient-sdk-linux.x64-12.2.0.1.0.zip -d /usr/local/ \
@@ -40,7 +42,7 @@ RUN unzip /tmp/instantclient-basiclite-linux.x64-12.2.0.1.0.zip -d /usr/local/ \
 RUN docker-php-ext-configure gd --with-freetype-dir=/usr/include/ --with-jpeg-dir=/usr/include/ \
     && docker-php-ext-configure hash --with-mhash \
     && docker-php-ext-configure oci8 --with-oci8=instantclient,/usr/local/instantclient \
-    && docker-php-ext-install -j$(nproc) mcrypt intl xsl gd zip pdo_mysql mysqli opcache soap bcmath json iconv oci8 sockets xml mbstring \
+    && docker-php-ext-install -j$(nproc) intl xsl gd zip pdo_mysql mysqli opcache soap bcmath json iconv oci8 sockets xml mbstring \
     && curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer \
     && pecl install xdebug && docker-php-ext-enable xdebug \
     && echo "xdebug.remote_enable=1" >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini \
@@ -53,7 +55,7 @@ RUN docker-php-ext-configure gd --with-freetype-dir=/usr/include/ --with-jpeg-di
     && echo "xdebug.remote_connect_back=0" >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini \
     && chmod 666 /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
 
-RUN apt-get install -y libmagickwand-6.q16-dev --no-install-recommends \
+RUN apt-get update && apt-get install -y libmagickwand-6.q16-dev --no-install-recommends \
 	&& ln -s /usr/lib/x86_64-linux-gnu/ImageMagick-6.8.9/bin-Q16/MagickWand-config /usr/bin \
 	&& pecl install imagick \
 	&& echo "extension=imagick.so" > /usr/local/etc/php/conf.d/ext-imagick.ini
@@ -64,7 +66,7 @@ RUN apt-get clean && apt-get update \
     && npm update -g npm && npm install -g grunt-cli && npm install -g gulp-cli
 
 RUN mkdir /var/run/sshd \
-	&& echo "StrictHostKeyChecking no" >> /etc/ssh/ssh_config \
+    && echo "StrictHostKeyChecking no" >> /etc/ssh/ssh_config \
     && apt-get install -y apache2 \
     && a2enmod rewrite \
     && a2enmod proxy \
@@ -105,20 +107,23 @@ ADD conf/php-fpm-magento2.conf /usr/local/etc/php-fpm.d/php-fpm-magento2.conf
 ADD conf/apache-default.conf /etc/apache2/sites-enabled/apache-default.conf
 
 # Postfix
-run echo "postfix postfix/main_mailer_type string Internet site" > preseed.txt
-run echo "postfix postfix/mailname string mail.example.com" >> preseed.txt
-run debconf-set-selections preseed.txt
-run DEBIAN_FRONTEND=noninteractive apt-get install -q -y postfix
-run postconf -e myhostname=mail.example.com
-run postconf -e mydestination="mail.example.com, example.com, localhost.localdomain, localhost"
-run postconf -e mail_spool_directory="/var/spool/mail/"
-run postconf -e mailbox_command=""
+RUN echo "postfix postfix/main_mailer_type string Internet site" > preseed.txt
+RUN echo "postfix postfix/mailname string mail.example.com" >> preseed.txt
+RUN debconf-set-selections preseed.txt
+RUN DEBIAN_FRONTEND=noninteractive apt-get install -q -y postfix
+RUN postconf -e myhostname=mail.example.com
+RUN postconf -e mydestination="mail.example.com, example.com, localhost.localdomain, localhost"
+RUN postconf -e mail_spool_directory="/var/spool/mail/"
+RUN postconf -e mailbox_command=""
 
 ADD conf/entrypoint.sh /usr/local/bin/entrypoint.sh
 RUN chmod +x /usr/local/bin/entrypoint.sh
 
 ENV PATH $PATH:/home/magento2/scripts/:/home/magento2/.magento-cloud/bin
 ENV PATH $PATH:/var/www/magento2/bin
+ENV LD_LIBRARY_PATH /usr/local/instantclient_12_2/
+
+RUN echo "export LD_LIBRARY_PATH=/usr/local/instantclient_12_2/" >> /home/magento2/.bashrc
 
 ENV SHARED_CODE_PATH /var/www/magento2
 ENV WEBROOT_PATH /var/www/magento2
