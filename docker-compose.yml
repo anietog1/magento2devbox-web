@@ -1,31 +1,48 @@
 version: '2'
 services:
-    web:
-        container_name: talosdevbox_web
-        image: talosdigital/magento2devbox-web:latest
-        volumes:
-          - ~/.composer:/home/magento2/.composer:delegated
-          - ~/.ssh:/home/magento2/.ssh:cached
-          - ./shared/logs/apache2:/var/log/apache2:delegated
-          - ./shared/logs/php-fpm:/var/log/php-fpm:delegated
-          - ./shared/apache2:/etc/apache2/host-config:cached
-          - ./shared/webroot:/var/www/magento2:delegated
-          - ./shared/webroot/app:/var/www/magento2/app:consistent
-        expose:
-          - "9000"
-        ports:
-          - "80:80"
-          - "443:443"
-          - "4022:22"
+  web:
+    container_name: talosdevbox_web
+    image: talosdigital/magento2devbox-web:latest
+    volumes:
+      - "~/.composer:/home/magento2/.composer:cached"
+      - "~/.ssh:/home/magento2/.ssh:cached"
+      - "~/.bash_aliases:/home/magento2/.bash_aliases:cached"
+      - "./shared/logs/apache2:/var/log/apache2:cached"
+      - "./shared/logs/php-fpm:/var/log/php-fpm:cached"
+      - "./shared/apache2:/etc/apache2/host-config:cached"
+      - "./shared/webroot/app:/var/www/magento2/app:consistent"
+      - "./shared/webroot/composer.json:/var/www/magento2/composer.json:consistent"
+      - "./shared/webroot/composer.lock:/var/www/magento2/composer.lock:consistent"
+    expose:
+      - "9000"
+    ports:
+      - "80:80"
+      - "443:443"
+      - "4022:22"
+    environment:
+      - SMTP_RELAY_HOST=smtp.gmail.com
+      - SMTP_RELAY_PORT=587
+      - SMTP_LOGIN=myemail@gmail.com
+      - SMTP_PASSWORD=123456
+      - MYORIGIN=mymagento.com
 
-    db:
-        container_name: talosdevbox_db
-        image: mysql:5.6
-        ports:
-          - "3306:3306"
-        environment:
-          - MYSQL_ROOT_PASSWORD=root
-          - MYSQL_DATABASE=mysql
-        volumes:
-          - "./shared/db:/var/lib/mysql"
-          - "./shared/var/logs/mysql:/var/log/mysql"
+  db:
+    container_name: talosdevbox_db
+    image: mariadb:10.0
+    ports:
+      - "3306:3306"
+    environment:
+      - MYSQL_ROOT_PASSWORD=root
+      - MYSQL_DATABASE=mysql
+    volumes:
+      - "./shared/db:/var/lib/mysql"
+      - "./shared/var/logs/mysql:/var/log/mysql"
+
+  elastic:
+    container_name: talley_elasticsearch
+    image: talosdigital/elasticsearch:latest
+    environment:
+      ES_JAVA_OPTS: "-Xms750m -Xmx750m"
+    ports:
+      - "9200:9200"
+      - "9300:9300"
