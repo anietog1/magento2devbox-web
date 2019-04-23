@@ -32,7 +32,9 @@ RUN apt-get update && apt-get install -y \
     psmisc \
     libaio-dev \
     gnupg \
-    mailutils
+    mailutils \
+    gettext-base \
+    dnsutils
 
 RUN unzip /tmp/instantclient-basiclite-linux.x64-12.2.0.1.0.zip -d /usr/local/ \
     && unzip /tmp/instantclient-sdk-linux.x64-12.2.0.1.0.zip -d /usr/local/ \
@@ -97,32 +99,25 @@ ADD conf/php.ini /usr/local/etc/php
 COPY conf/sshd_config /etc/ssh/sshd_config
 RUN chown magento2:magento2 /etc/ssh/ssh_config
 
-# supervisord config
-ADD conf/supervisord.conf /etc/supervisord.conf
-
-# php-fpm config
-ADD conf/php-fpm-magento2.conf /usr/local/etc/php-fpm.d/php-fpm-magento2.conf
-
-# apache config
-ADD conf/apache-default.conf /etc/apache2/sites-enabled/apache-default.conf
+# SUDO
+RUN echo "%sudo ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/magento2
 
 # Postfix
+RUN apt-get install -y procps libsasl2-modules opendkim opendkim-tools rsyslog
 RUN echo "postfix postfix/main_mailer_type string Internet site" > preseed.txt
 RUN echo "postfix postfix/mailname string mail.example.com" >> preseed.txt
 RUN debconf-set-selections preseed.txt
 RUN DEBIAN_FRONTEND=noninteractive apt-get install -q -y postfix
-RUN postconf -e myhostname=mail.example.com
-RUN postconf -e mydestination="mail.example.com, example.com, localhost.localdomain, localhost"
-RUN postconf -e mail_spool_directory="/var/spool/mail/"
-RUN postconf -e mailbox_command=""
-
-ADD conf/entrypoint.sh /usr/local/bin/entrypoint.sh
-RUN chmod +x /usr/local/bin/entrypoint.sh
+COPY conf/rsyslog.conf /etc/rsyslog.conf
+COPY conf/main.cf /etc/postfix/main.cf
+COPY conf/sasl_passwd /etc/postfix/sasl_passwd
+RUN chmod 0775 /var/log
+COPY scripts/postfix.sh /root/postfix.sh
 
 ENV PATH $PATH:/home/magento2/scripts/:/home/magento2/.magento-cloud/bin
 ENV PATH $PATH:/var/www/magento2/bin
 ENV LD_LIBRARY_PATH /usr/local/instantclient_12_2/
-
+RUN echo "cd /var/www/magento2" >> /home/magento2/.bashrc
 RUN echo "export LD_LIBRARY_PATH=/usr/local/instantclient_12_2/" >> /home/magento2/.bashrc
 
 ENV SHARED_CODE_PATH /var/www/magento2
@@ -137,9 +132,20 @@ RUN sed -i 's/^/;/' /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini \
 RUN chown -R magento2:magento2 /home/magento2 && \
     chown -R magento2:magento2 /var/www/magento2
 
+# supervisord config
+ADD conf/supervisord.conf /etc/supervisord.conf
+
+# php-fpm config
+ADD conf/php-fpm-magento2.conf /usr/local/etc/php-fpm.d/php-fpm-magento2.conf
+
+# apache config
+ADD conf/apache-default.conf /etc/apache2/sites-enabled/apache-default.conf
+
 EXPOSE 80 22 443 5000 9000 44100
 WORKDIR /home/magento2
 
 USER root
 
+ADD conf/entrypoint.sh /usr/local/bin/entrypoint.sh
+RUN chmod +x /usr/local/bin/entrypoint.sh
 ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
