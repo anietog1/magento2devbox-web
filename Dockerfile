@@ -109,8 +109,8 @@ RUN echo "postfix postfix/mailname string mail.example.com" >> preseed.txt
 RUN debconf-set-selections preseed.txt
 RUN DEBIAN_FRONTEND=noninteractive apt-get install -q -y postfix
 COPY conf/rsyslog.conf /etc/rsyslog.conf
-COPY conf/main.cf /etc/postfix/main.cf
-COPY conf/sasl_passwd /etc/postfix/sasl_passwd
+COPY conf/main.cf /root/main.cf
+COPY conf/sasl_passwd /root/sasl_passwd
 RUN chmod 0775 /var/log
 COPY scripts/postfix.sh /root/postfix.sh
 

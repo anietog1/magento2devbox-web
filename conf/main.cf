@@ -19,7 +19,7 @@ smtpd_relay_restrictions = permit_mynetworks permit_sasl_authenticated defer_una
 myhostname = local.$MYORIGIN
 myorigin = local.$MYORIGIN
 mydomain = docker.$MYORIGIN
-myhostname = docker.mymachine.$MYORIGIN
+
 mynetworks = 127.0.0.0/8 [::1]/128
 mydestination = $myhostname, localhost.$mydomain, localhost
 relayhost = $SMTP_RELAY_HOST:$SMTP_RELAY_PORT

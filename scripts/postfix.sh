@@ -1,7 +1,7 @@
 #!/bin/bash
 
-envsubst < /etc/postfix/main.cf > /etc/postfix/main.cf
-envsubst < /etc/postfix/sasl_passwd > /etc/postfix/sasl_passwd
+envsubst < /root/main.cf > /etc/postfix/main.cf
+envsubst < /root/sasl_passwd > /etc/postfix/sasl_passwd
 postmap /etc/postfix/sasl_passwd
 rm -f /var/spool/postfix/pid/*.pid
 cp /etc/resolv.conf /var/spool/postfix/etc/resolv.conf
