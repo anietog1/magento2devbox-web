@@ -27,8 +27,9 @@ brew install composer
 4. Override preference of PHP
 ```
 brew link php@7.3
+# follow instructions
 ```
-(follow instructions)
+
 
 5. Increase memory allocation
 ```
@@ -45,29 +46,31 @@ brew install havoc-io/mutagen/mutagen
 
 1. Download latest version (community)
 ```
-composer create-project --repository-url=https://repo.magento.com/ magento/project-community-edition ./magento2/shared/webroot
+composer create-project --repository-url=https://repo.magento.com/ magento/project-community-edition magento2
 ```
 
 2. Get your Magento credentials from magento.com and use them here
 
 3. Sample data (optional)
 ```
-./magento2/shared/webroot/bin/magento sampledata:deploy
+# use previous magento credentials
+./magento2/bin/magento sampledata:deploy
 ```
-(use previous credentials again)
+
 
 4. Copy mutagen.sh and docker-compose.yml to your project
 ```
 curl https://raw.githubusercontent.com/talosdigital/magento2devbox-web/master/docker-compose.yml > ./magento2/docker-compose.yml 
-curl https://raw.githubusercontent.com/talosdigital/magento2devbox-web/master/mutagen.sh > ./magento2/shared/webroot/mutagen.sh
+curl https://raw.githubusercontent.com/talosdigital/magento2devbox-web/master/mutagen.sh > ./magento2/mutagen.sh
 ```
 
 5. Modify keys for your project
 ```
 cd magento2
 vi docker-compose.yml
+
+# replace container name `talosdevbox` with `YOUR_PROJECT_CODENAME`
 ```
-(replace container name `talosdevbox` with `YOUR_PROJECT_CODENAME`)
 
 6. Start docker instances
 Make sure you have 80, 3360, 4022 and 9000 available in your computer.
@@ -77,10 +80,9 @@ docker-compose up -d
 
 7. Start Mutagen
 ```
-cd ./shared/webroot
 bash mutagen.sh
+# for monitoring, use: `mutagen sync monitor`
 ```
-(for monitoring, use: `mutagen sync monitor`)
 
 8. Add a domain to your local environment
 ```

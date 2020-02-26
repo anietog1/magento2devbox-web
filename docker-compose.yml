@@ -6,7 +6,7 @@ services:
         volumes:
           - ~/.composer:/home/magento2/.composer:cached
           - ~/.ssh:/home/magento2/.ssh:cached
-          - ./shared/apache2:/etc/apache2/host-config:cached
+          - ./var/docker/apache2:/etc/apache2/host-config:cached
         ports:
           - "80:80"
           - "443:443"
@@ -24,8 +24,8 @@ services:
           - MYSQL_PASSWORD=root
           - MYSQL_DATABASE=magento2
         volumes:
-          - ./shared/db:/var/lib/mysql:cached
-          - ./shared/var/logs/mysql:/var/log/mysql:cached
+          - ./var/docker/mariadb/db:/var/lib/mysql:cached
+          - ./var/docker/mariadb/logs:/var/log/mysql:cached
 
     elastic:
         container_name: talosdevbox_elasticsearch
