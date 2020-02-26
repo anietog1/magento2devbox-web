@@ -16,6 +16,8 @@ mutagen create \
        --ignore=/var/page_cache \
        --ignore=/var/cache \
        --ignore=/var/session \
+       --ignore=/var/composer_home \
+       --ignore=/var/docker \
        --ignore-vcs \
        --symlink-mode=posix-raw \
        ./ docker://$(docker ps | grep web | awk "{print \$1}")/var/www/magento2
