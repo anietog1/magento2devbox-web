@@ -113,6 +113,7 @@ List all containers
 
 Mutagen commands
 ```
+mutagen sync list
 mutagen sync monitor
 mutagen terminate --all
 ```
