@@ -3,66 +3,89 @@
 The intention of this work is to have a workable DevBox for local development, simplified and useful for our company development.
 Please refer to Magento for latest updates.
 
-** IF YOU WANT TO RUN MAGENTO1 CHECK TAG talosdigital/magento2devbox-web:php5.6 **
+** Check other branches for 5.6, 7.0, 7.1 and 7.2 **
 
-** UPDATE! for a better performance leave the magento files on docker only and sync manually doing the following***
-```
-1) remove "./shared/webroot:/var/www/magento2:delegated" from docker-compose.yml
-2) use dsyncin and dsyncout when you need to sync files
-```
 
-# Software requirements
-1. Docker
+# Setup local machine (Mac)
 
-# Installation
-1. Prepare your project folder
+1. Setup Mac with PHP
 ```
-mkdir -p myproject/shared
-cd myproject
-curl https://raw.githubusercontent.com/talosdigital/magento2devbox-web/master/docker-compose.yml > docker-compose.yml 
+xcode-select --install
 ```
 
-2. Modify keys for your project
+2. Brew
 ```
-#
-# file: docker-compose.yml
-#   replace `talosdevbox` with `YOUR_PROJECT_CODENAME`
-#
+/usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
 ```
 
-3. Place your project files under `./shared/webroot`
+3. PHP
 ```
-# EXAMPLE: follow the next steps to create a Magento2 installation from scratch 
-composer create-project --repository-url=https://repo.magento.com/ magento/project-community-edition ./shared/webroot
-cd shared/webroot
-php bin/magento sampledata:deploy
+brew install php@7.3
+brew install composer
 ```
 
-4. Start docker instances
+4. Override preference of PHP
+```
+brew link php@7.3
+```
+(follow instructions)
+
+5. Increase memory allocation
+```
+vi /usr/local/etc/php/7.3/php.ini
+memory_limit = 2048M
+```
+
+6. Mutagen
+```
+brew install havoc-io/mutagen/mutagen
+```
+
+# Setup my first project
+
+1. Download latest version (community)
+```
+composer create-project --repository-url=https://repo.magento.com/ magento/project-community-edition ./magento2/shared/webroot
+```
+
+2. Get your Magento credentials from magento.com and use them here
+
+3. Sample data (optional)
+```
+./magento2/shared/webroot/bin/magento sampledata:deploy
+```
+(use previous credentials again)
+
+4. Copy mutagen.sh and docker-compose.yml to your project
+```
+curl https://raw.githubusercontent.com/talosdigital/magento2devbox-web/master/docker-compose.yml > ./magento2/docker-compose.yml 
+curl https://raw.githubusercontent.com/talosdigital/magento2devbox-web/master/mutagen.sh > ./magento2/shared/webroot/mutagen.sh
+```
+
+5. Modify keys for your project
+```
+cd magento2
+vi docker-compose.yml
+```
+(replace container name `talosdevbox` with `YOUR_PROJECT_CODENAME`)
+
+6. Start docker instances
 Make sure you have 80, 3360, 4022 and 9000 available in your computer.
 ```
-docker-compose up
+docker-compose up -d
 ```
 
-5. Network alias to your docker machine (Mac)
+7. Start Mutagen
 ```
-sudo ifconfig lo0 alias 10.254.254.254 255.255.255.0 # Check bellow how to add it at startup
+cd ./shared/webroot
+bash mutagen.sh
+```
+(for monitoring, use: `mutagen sync monitor`)
+
+8. Add a domain to your local environment
+```
 sudo vi /etc/hosts
-10.254.254.254 db
-10.254.254.254 local.magento2ce.com
-```
-
-6. Prepare database
-```
-mysql -h db -uroot -proot
-CREATE DATABASE magento2ce;
-```
-
-7. Magento env.php file. Please use the following settings:
-```
-# Database Server Host: db
-# Database Server Username: root
-# Database Server Password: root
+127.0.0.1 local.magento2.com
 ```
 
 # Useful commands
@@ -70,17 +93,14 @@ CREATE DATABASE magento2ce;
 Alias
 ```
 # Useful aliases
-alias mysqldocker='mysql -h 10.254.254.254 -uroot -proot'
+alias mysqldocker='mysql -h 127.0.0.1 -uroot -proot'
 alias sshdocker='ssh -p 4022 -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -t magento2@localhost "cd /var/www/magento2; bash"'
-alias dsyncin='rsync -rvtu -e "ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -p 4022" --exclude="app"  --exclude=".git/" --exclude=".idea/" . magento2@10.254.254.254:/var/www/magento2'
-alias dsyncout='rsync -rvtu -e "ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -p 4022" --exclude="app"  --exclude=".git/" --exclude=".idea/" --exclude="generated/*" --exclude="var/*" --exclude="pub/static/*" magento2@10.254.254.254:/var/www/magento2/* .'
 ```
 
 Magento Bin
 ```
-ssh -p 4022 magento2@localhost # FYI password: magento2
-cd /var/www/magento2
-php bin/magento cache:flush
+sshdocker
+./bin/magento cache:flush
 ```
 
 List running containers
@@ -89,13 +109,12 @@ List running containers
 List all containers
 ```docker ps```
 
-# Alias loopback interface (lo0) script at startup (Mac)
+Mutagen commands
 ```
-sudo bash -c "curl https://raw.githubusercontent.com/talosdigital/magento2devbox-web/master/com.network.alias.plist > /Library/LaunchDaemons/com.network.alias.plist"
-sudo chmod 0644 /Library/LaunchDaemons/com.network.alias.plist
-sudo chown root:wheel /Library/LaunchDaemons/com.network.alias.plist
-sudo launchctl load /Library/LaunchDaemons/com.network.alias.plist
+mutagen sync monitor
+mutagen terminate --all
 ```
+
 
 # PHPSTORM xDebug setup (Mac)
 
@@ -103,7 +122,3 @@ sudo launchctl load /Library/LaunchDaemons/com.network.alias.plist
 ![phpstorm2](https://raw.githubusercontent.com/talosdigital/magento2devbox-web/master/phpstorm2.png)
 ![phpstorm3](https://raw.githubusercontent.com/talosdigital/magento2devbox-web/master/phpstorm3.png)
 
-# Passwords
-```MySQL: root root```
-
-```Linux: magento2 magento2```

@@ -2,30 +2,36 @@ version: '2'
 services:
     web:
         container_name: talosdevbox_web
-        image: talosdigital/magento2devbox-web:latest
+        image: magento-dev-box:latest
         volumes:
-          - ~/.composer:/home/magento2/.composer:delegated
+          - ~/.composer:/home/magento2/.composer:cached
           - ~/.ssh:/home/magento2/.ssh:cached
-          - ./shared/logs/apache2:/var/log/apache2:delegated
-          - ./shared/logs/php-fpm:/var/log/php-fpm:delegated
           - ./shared/apache2:/etc/apache2/host-config:cached
-          - ./shared/webroot:/var/www/magento2:delegated
-          - ./shared/webroot/app:/var/www/magento2/app:consistent
-        expose:
-          - "9000"
         ports:
           - "80:80"
           - "443:443"
           - "4022:22"
+          - "9000:9000"
 
     db:
         container_name: talosdevbox_db
-        image: mysql:5.6
+        image: mariadb:10.2
         ports:
           - "3306:3306"
         environment:
+          - MYSQL_USER=root
           - MYSQL_ROOT_PASSWORD=root
-          - MYSQL_DATABASE=mysql
+          - MYSQL_PASSWORD=root
+          - MYSQL_DATABASE=magento2
         volumes:
-          - "./shared/db:/var/lib/mysql"
-          - "./shared/var/logs/mysql:/var/log/mysql"
+          - ./shared/db:/var/lib/mysql:cached
+          - ./shared/var/logs/mysql:/var/log/mysql:cached
+
+    elastic:
+        container_name: talosdevbox_elasticsearch
+        image: talosdigital/elasticsearch:latest
+        environment:
+          ES_JAVA_OPTS: "-Xms750m -Xmx750m"
+        ports:
+          - "9200:9200"
+          - "9300:9300"
