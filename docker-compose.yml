@@ -1,20 +1,21 @@
 version: '2'
 services:
     web:
-        container_name: talosdevbox_web
-        image: talosdigital/magento2devbox-web:latest
+        container_name: magento2_web
+        image: talosdigital/magento2devbox-web:php7.3
         volumes:
           - ~/.composer:/home/magento2/.composer:cached
           - ~/.ssh:/home/magento2/.ssh:cached
           - ./var/docker/apache2:/etc/apache2/host-config:cached
+        expose:
+          - 9000
         ports:
           - "80:80"
           - "443:443"
           - "4022:22"
-          - "9000:9000"
 
     db:
-        container_name: talosdevbox_db
+        container_name: magento2_db
         image: mariadb:10.2
         ports:
           - "3306:3306"
@@ -23,12 +24,13 @@ services:
           - MYSQL_ROOT_PASSWORD=root
           - MYSQL_PASSWORD=root
           - MYSQL_DATABASE=magento2
+          - innodb-buffer-pool-size=134217728
         volumes:
           - ./var/docker/mariadb/db:/var/lib/mysql:cached
           - ./var/docker/mariadb/logs:/var/log/mysql:cached
 
     elastic:
-        container_name: talosdevbox_elasticsearch
+        container_name: magento2_elasticsearch
         image: talosdigital/elasticsearch:latest
         environment:
           ES_JAVA_OPTS: "-Xms750m -Xmx750m"
