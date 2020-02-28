@@ -2,7 +2,7 @@ version: '2'
 services:
     web:
         container_name: magento2_web
-        image: talosdigital/magento2devbox-web:php7.3
+        image: talosdigital/magento2devbox-web:latest
         volumes:
           - ~/.composer:/home/magento2/.composer:cached
           - ~/.ssh:/home/magento2/.ssh:cached
