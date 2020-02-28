@@ -97,26 +97,28 @@ sudo vi /etc/hosts
 
 # Useful commands
 
-Alias
+*Alias*
 ```
-# Useful aliases
 alias mysqldocker='mysql -h 127.0.0.1 -uroot -proot'
 alias sshdocker='ssh -p 4022 -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -t magento2@localhost "cd /var/www/magento2; bash"'
 ```
 
-Magento Bin
+*Magento Bin*
 ```
 sshdocker
 ./bin/magento cache:flush
 ```
 
-List running containers
-```docker ps```
+*Docker*
+```
+docker ps
+docker ps -a
+docker images
+docker-compose up -d
+docker-compose stop
+```
 
-List all containers
-```docker ps```
-
-Mutagen commands
+*Mutagen commands*
 ```
 mutagen sync list
 mutagen sync monitor
