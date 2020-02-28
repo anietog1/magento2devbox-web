@@ -5,6 +5,10 @@ Please refer to Magento for latest updates.
 
 ** Check other branches for 5.6, 7.0, 7.1 and 7.2 **
 
+# Docker recommended settings
+* CPUs 6
+* Memory 8Gb 
+* Swap 1Gb
 
 # Setup local machine (Mac)
 
@@ -117,11 +121,3 @@ mutagen sync list
 mutagen sync monitor
 mutagen terminate --all
 ```
-
-
-# PHPSTORM xDebug setup (Mac)
-
-![phpstorm1](https://raw.githubusercontent.com/talosdigital/magento2devbox-web/master/phpstorm1.png)
-![phpstorm2](https://raw.githubusercontent.com/talosdigital/magento2devbox-web/master/phpstorm2.png)
-![phpstorm3](https://raw.githubusercontent.com/talosdigital/magento2devbox-web/master/phpstorm3.png)
-
