@@ -1,9 +1,10 @@
-# PLEASE READ
+# Talos Magento Docker / Community Development
 
-The intention of this work is to have a workable DevBox for local development, simplified and useful for our company development.
-Please refer to Magento for latest updates.
+The intention of this docker is to have a workable DevBox for local development, simplified and useful for our company development.
 
-** Check other branches for 5.6, 7.0, 7.1 and 7.2 **
+This is useful for community Magento projects, in case of Commerce license please use Magento Cloud instances.
+
+Previous relelases: Check other branches for 5.6, 7.0, 7.1 and 7.2
 
 # Docker recommended settings
 * CPUs 6
