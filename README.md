@@ -95,6 +95,16 @@ sudo vi /etc/hosts
 127.0.0.1 local.magento2.com
 ```
 
+# XDebug
+![XDebug1](xdebug1.jpg)
+
+![XDebug2](xdebug2.jpg)
+
+![XDebug3](xdebug3.jpg)
+
+
+
+
 # Useful commands
 
 *Alias*
