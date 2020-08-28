@@ -1,4 +1,4 @@
-FROM php:7.3.15-fpm
+FROM php:7.4.0-fpm
 MAINTAINER "Talos Digital"
 
 ENV PHP_EXTRA_CONFIGURE_ARGS="--enable-fpm --with-fpm-user=magento2 --with-fpm-group=magento2"
@@ -34,11 +34,12 @@ RUN apt-get install -y \
     mailutils \
 	dnsutils \
 	redis-server \
-	iputils-ping
+	iputils-ping \
+	libonig-dev
 
 RUN apt-get install -y libzip-dev
 
-RUN docker-php-ext-configure gd --with-freetype-dir=/usr/include/ --with-jpeg-dir=/usr/include/ \
+RUN docker-php-ext-configure gd --with-freetype --with-jpeg \
     && docker-php-ext-configure hash --with-mhash \
     && docker-php-ext-install -j$(nproc) intl xsl gd zip pdo_mysql mysqli opcache soap bcmath json iconv sockets xml mbstring \
     && curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer \
