@@ -104,8 +104,12 @@ sudo vi /etc/hosts
 
 
 
-
 # Useful commands
+
+*Magento 2.4 terminal installation*
+```
+./bin/magento setup:install --base-url=http://local.vista.com/ --db-host=db --db-name=magento2 --db-user=root --db-password=root --admin-firstname=Ignacio --admin-lastname=Pascual --admin-email=ignacio@example.com --admin-user=ipascual --admin-password=Test4echo --language=en_US --currency=USD --timezone=America/Chicago --use-rewrites=1 --elasticsearch-host=elastic
+```
 
 *Alias*
 ```
