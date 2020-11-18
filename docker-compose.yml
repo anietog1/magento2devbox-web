@@ -1,37 +1,42 @@
-version: '2'
+version: '2.1'
 services:
-    web:
-        container_name: magento2_web
-        image: talosdigital/magento2devbox-web:latest
-        volumes:
-          - ~/.composer:/home/magento2/.composer:cached
-          - ~/.ssh:/home/magento2/.ssh:cached
-          - ./var/docker/apache2:/etc/apache2/host-config:cached
-        expose:
-          - 9000
-        ports:
-          - "80:80"
-          - "443:443"
-          - "4022:22"
-
-    db:
-        container_name: magento2_db
-        image: mariadb:10.2
-        ports:
-          - "3306:3306"
-        environment:
-          - MYSQL_ROOT_PASSWORD=root
-          - MYSQL_DATABASE=magento2
-          - innodb-buffer-pool-size=134217728
-        volumes:
-          - ./var/docker/mariadb/db:/var/lib/mysql:cached
-          - ./var/docker/mariadb/logs:/var/log/mysql:cached
-
-    elastic:
-        container_name: magento2_elasticsearch
-        image: talosdigital/elasticsearch:latest
-        environment:
-          ES_JAVA_OPTS: "-Xms750m -Xmx750m"
-        ports:
-          - "9200:9200"
-          - "9300:9300"
+  db:
+    hostname: db.magento2.docker
+    image: 'mariadb:10.2'
+    environment:
+      - MYSQL_ROOT_PASSWORD=magento2
+      - MYSQL_DATABASE=magento2
+      - MYSQL_USER=magento2
+      - MYSQL_PASSWORD=magento2
+    ports:
+      - '3306:3306'
+    volumes:
+      - ./var/docker/mariadb/db:/var/lib/mysql:cached
+    healthcheck:
+      test: 'mysqladmin ping -h localhost'
+      interval: 30s
+      timeout: 30s
+      retries: 3
+  redis:
+    hostname: redis.magento2.docker
+    image: 'redis:5.0'
+    ports:
+      - '6379:6379'
+    healthcheck:
+      test: 'redis-cli ping || exit 1'
+      interval: 30s
+      timeout: 30s
+      retries: 3
+  elasticsearch:
+    hostname: elasticsearch.magento2.docker
+    image: 'magento/magento-cloud-docker-elasticsearch:6.5-1.1'
+    ports:
+      - '9200:9200'
+  mailhog:
+    hostname: mailhog.magento2.docker
+    image: 'mailhog/mailhog:latest'
+    restart: always
+    command: ['-storage=maildir', '-maildir-path=/home/mailhog/maildir']
+    ports:
+      - '1025:1025'
+      - '8025:8025'
